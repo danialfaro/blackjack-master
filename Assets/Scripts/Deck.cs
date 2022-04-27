@@ -57,9 +57,16 @@ public class Deck : MonoBehaviour
          */
         for (int i = 0; i < values.Length; i++)
         {
-            int newIndex = UnityEngine.Random.Range(0, values.Length);
-            values[i] = values[newIndex];
-            faces[i] = faces[newIndex];
+            int firstIndex = UnityEngine.Random.Range(0, values.Length);
+            int secondIndex = UnityEngine.Random.Range(0, values.Length);
+
+            int firstValue = values[firstIndex];
+            values[firstIndex] = values[secondIndex];
+            values[secondIndex] = firstValue;
+
+            Sprite firstFace = faces[firstIndex];
+            faces[firstIndex] = faces[secondIndex];
+            faces[secondIndex] = firstFace;           
         }
     }
 
@@ -72,6 +79,7 @@ public class Deck : MonoBehaviour
             /*TODO:
              * Si alguno de los dos obtiene Blackjack, termina el juego y mostramos mensaje
              */
+            CheckWinner();
             
         }
     }
@@ -110,14 +118,16 @@ public class Deck : MonoBehaviour
         /*TODO: 
          * Si estamos en la mano inicial, debemos voltear la primera carta del dealer.
          */
-        
+        CardHand dealerCardHand = dealer.GetComponent<CardHand>();
+        if (dealerCardHand.cards.Count == 2) dealerCardHand.InitialToggle();
+
         //Repartimos carta al jugador
         PushPlayer();
 
         /*TODO:
          * Comprobamos si el jugador ya ha perdido y mostramos mensaje
-         */      
-
+         */
+        CheckWinner();
     }
 
     public void Stand()
@@ -146,5 +156,12 @@ public class Deck : MonoBehaviour
         StartGame();
     }
 
-   
+    void CheckWinner()
+    {
+        CardHand playerCardHand = player.GetComponent<CardHand>();
+        CardHand dealerCardHand = dealer.GetComponent<CardHand>();
+        if (playerCardHand.points == 21 || dealerCardHand.points > 21) finalMessage.text = "Player wins!";
+        else if(dealerCardHand.points == 21 || playerCardHand.points > 21) finalMessage.text = "Dealer wins!";
+    }
+    
 }
